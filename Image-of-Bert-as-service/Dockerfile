@@ -6,6 +6,8 @@ RUN apt-get update && apt-get install -y software-properties-common && add-apt-r
 RUN ln -sfn /usr/bin/python3.6 /usr/bin/python3 && ln -sfn /usr/bin/python3 /usr/bin/python && ln -sfn /usr/bin/pip3 /usr/bin/pip
 
 RUN apt-get install unzip
+RUN pip install --upgrade pip
+RUN pip install setuptools==41.0.0
 RUN pip install tensorflow==1.14.0
 RUN pip install bert-serving-server
 RUN pip install bert-serving-client
