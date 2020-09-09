@@ -54,3 +54,57 @@ two existing strategies for applying pre-trained language representations to dow
 2. ﬁne-tuning: such as the Generative Pre-trained Transformer, introduces minimal task-speciﬁc parameters, and is trained on the downstream tasks by simply ﬁne-tuning all pretrained parameters
 
 The two approaches share the same objective function during pre-training, where they use unidirectional language models to learn general language representations.
+
+BERT alleviates the previously mentioned unidirectionality constraint by using a “masked language model” (MLM) pre-training objective, inspired by the Cloze task (Taylor, 1953). The masked language model randomly masks some of the tokens from the input, and the objective is to predict the original vocabulary id of the masked word based only on its context.
+
+There are two steps in BERT framework: pre-training and ﬁne-tuning. During pre-training, the model is trained on unlabeled data over different pre-training tasks. For ﬁnetuning, the BERT model is ﬁrst initialized with the pre-trained parameters, and all of the parameters are ﬁne-tuned using labeled data from the downstream tasks. Each downstream task has separate ﬁne-tuned models, even though they are initialized with the same pre-trained parameters.
+
+## X as service
+
+```
+from jina.flow import Flow
+
+f = (Flow(callback_on_body=True)
+     .add(name='spit', uses='Sentencizer')
+     .add(name='encode', uses='jinaai/hub.executors.encoders.nlp.transformers-pytorch',
+          parallel=2, timeout_ready=20000))
+
+```
+1. What is transformers
+
+	"Griezmann", "his", "Frenchman" can be pointed as one person in a paragraph. Capturing such relationships and sequence of words in sentences is vital for a machine to understand a natural language. This is where the Transformer concept plays a major role.
+
+	1. Sequence-to-Sequence Models – A Backdrop
+		
+		convert sequences of Type A to sequences of Type B. For example, translation of English sentences to German sentences is a sequence-to-sequence task.
+		
+	2. Recurrent Neural Network (RNN) based sequence-to-sequence models
+		（1）Both Encoder and Decoder are RNNs
+		（2）At every time step in the Encoder, the RNN takes a word vector (xi) from the input sequence and a hidden state (Hi) from the previous time step
+		（3）The hidden state is updated at each time step
+		（4）The hidden state from the last unit is known as the context vector. This contains information about the input sequence
+	
+	The Transformer in NLP is a novel architecture that aims to solve sequence-to-sequence tasks while handling long-range dependencies with ease.
+	
+	
+2. What is ```jinaai/hub.executors.encoders.nlp.transformers-pytorch``` and how to change it.
+	
+	[url is here](https://www.analyticsvidhya.com/blog/2019/07/pytorch-transformers-nlp-python/?utm_source=blog&utm_medium=7-innovative-machine-learning-github-projects-in-python)
+
+	'I have taken this p from PyTorch-Transformers’ documentation. This library currently contains PyTorch implementations, pre-trained model weights, usage scripts and conversion utilities for the following models:
+
+	BERT (from Google) released with the paper BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding
+
+	GPT (from OpenAI) released with the paper Improving Language Understanding by Generative Pre-Training
+
+	GPT-2 (from OpenAI) released with the paper Language Models are Unsupervised Multitask Learners
+
+	Transformer-XL (from Google/CMU) released with the paper Transformer-XL: Attentive Language Models Beyond a Fixed-Length Context
+
+	XLNet (from Google/CMU) released with the paper XLNet: Generalized Autoregressive Pretraining for Language Understanding
+
+	XLM (from Facebook) released together with the paper Cross-lingual Language Model Pretraining
+
+	All of the above models are the best in class for various NLP tasks. Some of these models are as recent as the previous month!
+
+	Most of the State-of-the-Art models require tons of training data and days of training on expensive GPU hardware which is something only the big technology companies and research labs can afford. But with the launch of PyTorch-Transformers, now anyone can utilize the power of State-of-the-Art models!'
