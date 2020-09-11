@@ -17,7 +17,7 @@
 [参考链接3](https://blog.csdn.net/xbw12138/article/details/79126396)
  
 ## Ernie
-NLP 任务的解决过程
+###NLP 任务的解决过程
 
 1. 基于tokenization.py脚本中的Tokenizer对输入的句子进行token化，即按字粒度对句子进行切分；
 2. 分类标志符号[CLS]与token化后的句子拼接在一起作为ERNIE模型的输入，经过 ERNIE 前向计算后得到每个token对应的embedding向量表示；
@@ -27,7 +27,7 @@ NLP 任务的解决过程
 
 [simple-case代码及简易教程](https://aistudio.baidu.com/aistudio/projectdetail/874233)
 
-运行除ernie-with-jina的dockerfile外所需额外环境：
+###运行除ernie-with-jina的dockerfile外所需额外环境：
 
 ```pip install vim```
 
@@ -43,12 +43,12 @@ NLP 任务的解决过程
 
 ## BERT（Bidirectional Encoder Representations from Transformers）
 
-natural language processing tasks:
+### natural language processing tasks:
 
 1. sentence-level tasks such as natural language inference and paraphrasing, which aim to predict the relationships between sentences by analyzing them holistically
 2. token-level tasks such as named entity recognition and question answering, where models are required to produce ﬁne-grained output at the token level
 
-two existing strategies for applying pre-trained language representations to downstream tasks: 
+### two existing strategies for applying pre-trained language representations to downstream tasks: 
 
 1. feature-based: such as ELMo, uses task-speciﬁc architectures that include the pre-trained representations as additional features 
 2. ﬁne-tuning: such as the Generative Pre-trained Transformer, introduces minimal task-speciﬁc parameters, and is trained on the downstream tasks by simply ﬁne-tuning all pretrained parameters
@@ -108,3 +108,42 @@ f = (Flow(callback_on_body=True)
 	All of the above models are the best in class for various NLP tasks. Some of these models are as recent as the previous month!
 
 	Most of the State-of-the-Art models require tons of training data and days of training on expensive GPU hardware which is something only the big technology companies and research labs can afford. But with the launch of PyTorch-Transformers, now anyone can utilize the power of State-of-the-Art models!'
+	
+## Jina
+### Document & Chunk
+
+1. a Document is anything that you want to search for
+
+2. a Chunk is a small semantic unit of a Document
+
+### YAML config 
+
+A YAML config is widely used in Jina to describe the properties of an object.
+
+### Executor
+
+Executor represents an algorithmic unit in Jina.
+
+### Driver
+
+Driver defines how an Executor behaves on network requests.
+
+### Pea
+
+Pea wraps an Executor and grants it the ability to exchange data over a network. 
+
+### Pod
+
+Pod is a group of Peas with the same property. 
+
+### Flow
+
+Flow represents a high-level task,
+
+```
+f = (Flow().add(name='p1')
+           .add(name='p2', image='jinaai/hub.executors.encoders.bidaf:latest')
+           .add(name='p3'))
+```
+p2 is running in a container
+
