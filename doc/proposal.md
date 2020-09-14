@@ -147,3 +147,53 @@ f = (Flow().add(name='p1')
 ```
 p2 is running in a container
 
+
+### 跑通xx-as-service的example
+代码如下
+
+``` 
+from jina.flow import Flow
+
+f = (Flow(callback_on_body=True)
+     .add(name='spit', uses='Sentencizer')
+     .add(name='encode', uses='enc.yml',
+          parallel=2, timeout_ready=20000))
+```
+
+```enc.yml```
+为
+
+```
+!TransformerTorchEncoder
+with:
+  pooling_strategy: cls
+  model_name: distilbert-base-cased
+  max_length: 96
+```
+
+```
+def input_fn():
+    with open('README.md') as fp:
+        for v in fp:
+            yield v.encode()
+```
+```
+def print_embed(req):
+    for d in req.docs:
+        for c in d.chunks:
+            embed = pb2array(c.embedding)
+            text = colored(f'{c.text[:10]}...' if len(c.text) > 10 else c.text, 'blue')
+            print(f'{text} embed to {embed.shape} [{embed[0]:.3f}, {embed[1]:.3f}...]')
+```
+```
+with f:
+    f.index(input_fn, batch_size=32, callback=print_embed)
+
+```
+需安装的依赖有:
+
+``` pip install transformers```
+
+``` pip install torch torchvision -i https://pypi.tuna.tsinghua.edu.cn/simple```
+
+
