@@ -24,8 +24,9 @@
 3. 在单句分类任务中，[CLS]位置对应的嵌入式向量会用来作为分类特征。只需将[CLS]对应的embedding抽取出来，再经过一个全连接层得到分类的 logits 值，最后经过softmax归一化后与训练数据中的label一起计算交叉熵，就得到了优化的损失函数；
 4. 经过几轮的fine-tuning，就可以训练出解决具体任务的ERNIE模型。
 
-
 [simple-case代码及简易教程](https://aistudio.baidu.com/aistudio/projectdetail/874233)
+
+
 
 ###运行除ernie-with-jina的dockerfile外所需额外环境：
 
@@ -270,4 +271,58 @@ with f:
 ``` pip install transformers```
 
 ``` pip install torch torchvision -i https://pypi.tuna.tsinghua.edu.cn/simple```
+
+### 测试版本
+
+python 3.7.8
+
+所需依赖：
+
+```python3 -m pip install paddlepaddle -i https://mirror.baidu.com/pypi/simple```
+
+```pip install jina```
+
+import numpy as np
+
+ from jina.executors.encoders import BaseEncoder
+
+ class MWUEncoder(BaseEncoder):
+
+```mwu.py```
+
+```python
+import numpy as np
+
+from jina.executors.encoders import BaseEncoder
+
+import paddle.fluid as fluid
+
+class MWUEncoder(BaseEncoder):
+
+    def __init__(self, greetings: str, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._greetings = greetings
+
+    def encode(self, data, *args, **kwargs):
+        self.logger.info('%s %s' % (self._greetings, data))
+        data = np.random.random([data.shape[0], 3])
+        add = fluid.layers.elementwise_add(data,data)
+        place = fluid.CPUPlace()
+        exe = fluid.Executor(place)
+        add_result = exe.run(fluid.default_main_program(),
+                 fetch_list=[add],
+                 return_numpy=True)
+        return add_result
+```
+### 测试 Build Bert-based NLP Semantic Search System
+
+在一个terminal打开：
+
+``` docker run -p 45678:45678 jinaai/hub.app.distilbert-southpark:latest```
+
+在另一个terminal打开：
+
+```curl --request POST -d '{"top_k": 10, "mode": "search",  "data": ["text:hey, Monica"]}' -H 'Content-Type: application/json' 'http://0.0.0.0:45678/api/search'```
+
+
 
