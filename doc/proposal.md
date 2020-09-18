@@ -270,7 +270,22 @@ with f:
 
 ``` pip install transformers```
 
-``` pip install torch torchvision -i https://pypi.tuna.tsinghua.edu.cn/simple```
+``` pip install torch torchvision -i https://pypi.tuna.tsinghua.edu.cn/simple``` 
+
+问题
+
+在docker上运行，会有一下问题
+
+```
+🐳 usage: jina [-h] [-v] [-vf]
+🐳 {hello-world, pod, flow, gateway ... 6 more choices} ...
+🐳 jina: error: unrecognized arguments: --port-expose 62290
+         encode@9412[S]:terminated
+         encode@9408[C]:fail to start <class 'jina.peapods.container.ContainerPea'> with name encode, this often means the executor used in the pod is not valid
+
+```
+
+疑似缺少argument
 
 ### 测试版本
 
