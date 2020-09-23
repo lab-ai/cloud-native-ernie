@@ -61,6 +61,8 @@ BERT不是在给定所有前面词的条件下预测最可能的当前词，而�
 
 ## BERT 预训练
 
+### BERT in PaddlePaddle
+
 ```train.py```
 
 1. ```paddle.fluid.layers.py_reader(capacity, shapes, dtypes, lod_levels=None, name=None, use_double_buffer=True)``` 创建一个在Python端提供数据的reader。该Reader提供了 `decorate_paddle_reader()` 和 `decorate_tensor_provider()` 来设置Python generator作为数据源，将数据源中的数据feed到Reader Variable。[参考链接](https://www.paddlepaddle.org.cn/documentation/docs/zh/api_cn/layers_cn/py_reader_cn.html#paddle.fluid.layers.py_reader)
@@ -102,7 +104,75 @@ BERT不是在给定所有前面词的条件下预测最可能的当前词，而�
    exe.run(startup_prog)
    ```
 
-6. DataReader
+6. Use DataReader to get data
 
 7. Start training
+
+### BERT-pytorch
+
+```
+|-- __init__.py
+|-- __main__.py
+|-- trainer
+|-- |-- __init__.py
+|-- |-- optim_schedule.py
+|-- |-- pretrain.py
+|-- model
+|-- |-- attention
+|-- |-- |-- __init__.py
+|-- |-- |-- multi_head.py
+|-- |-- |-- single.py
+|-- |-- embedding
+|-- |-- |-- __init__.py
+|-- |-- |-- bert.py
+|-- |-- |-- position.py
+|-- |-- |-- segment.py
+|-- |-- |-- token.py
+|-- |-- utils
+|-- |-- |-- __init__.py
+|-- |-- |-- feed_forward.py
+|-- |-- |-- gelu.py
+|-- |-- |-- layer_norm.py
+|-- |-- |-- sublayer.py
+|-- |-- __init__.py
+|-- |-- bert.py
+|-- |-- language_model.py
+|-- |-- transformer.py
+|-- dataset
+|-- |-- __init__.py
+|-- |-- dataset.py
+|-- |-- vocab.py
+```
+
+
+
+```__main__.py```
+
+1. Set bert
+2. Set trainer
+3. trainer.train()
+
+```model/bert.py``` (model)
+
+1. x -> mask
+2. x + segment_info -> x (embedding)
+3. x + mask -> x (transformer)
+4. return x
+
+```model/transformer.py``` (model)
+
+1. _x -> _x (MultiHeadedAttention)
+2. x + _x -> x (SublayerConnection)
+3. x + PositionwiseFeedForward -> x (SublayerConnection)
+4. x -> x (dropout)
+5. return x
+
+```model/embedding/bert.py``` (model)
+
+1. sequence -> tmp1 (TokenEmbedding)
+2. sequence -> tmp2 (PositionalEmbedding)
+3. segment_label -> tmp3 (SegmentEmbedding)
+4. Tmp1 + tmp2 + tmp3 -> x
+5. x -> x (dropout)
+6. return x
 
