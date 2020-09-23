@@ -65,9 +65,44 @@ BERT不是在给定所有前面词的条件下预测最可能的当前词，而�
 
 1. ```paddle.fluid.layers.py_reader(capacity, shapes, dtypes, lod_levels=None, name=None, use_double_buffer=True)``` 创建一个在Python端提供数据的reader。该Reader提供了 `decorate_paddle_reader()` 和 `decorate_tensor_provider()` 来设置Python generator作为数据源，将数据源中的数据feed到Reader Variable。[参考链接](https://www.paddlepaddle.org.cn/documentation/docs/zh/api_cn/layers_cn/py_reader_cn.html#paddle.fluid.layers.py_reader)
 
-2. ``` class paddle.fluid.executor.Executor(place)``` 执行引擎（Executor）使用python脚本驱动，支持在单/多GPU、单/多CPU环境下运行。 Python Executor可以接收传入的program,并根据feed map(输入映射表)和fetch_list(结果获取表) 向program中添加feed operators(数据输入算子)和fetch operators（结果获取算子)。 feed map为该program提供输入数据。fetch_list提供program训练结束后用户预期的变量（或识别类场景中的命名）。
+2. ```paddle.fluid.layers.read_file(reader)``` 从给定的reader中读取数据
+
+   reader是一个Variable，它可以是由函数fluid.layers.py_reader()生成的reader，或者是由函数fluid.layers.double_buffer()生成的装饰Variable。[参考链接](https://www.paddlepaddle.org.cn/documentation/docs/zh/1.7/api_cn/layers_cn/read_file_cn.html)
+
+3. ``` class paddle.fluid.executor.Executor(place)``` 执行引擎（Executor）使用python脚本驱动，支持在单/多GPU、单/多CPU环境下运行。 Python Executor可以接收传入的program,并根据feed map(输入映射表)和fetch_list(结果获取表) 向program中添加feed operators(数据输入算子)和fetch operators（结果获取算子)。 feed map为该program提供输入数据。fetch_list提供program训练结束后用户预期的变量（或识别类场景中的命名）。
 
    应注意，执行器会执行program中的所有算子而不仅仅是依赖于fetch_list的那部分。
 
    Executor将全局变量存储到全局作用域中，并为临时变量创建局部作用域。 当每一mini-batch上的前向/反向运算完成后，局部作用域的内容将被废弃， 但全局作用域中的变量将在Executor的不同执行过程中一直存在。[参考链接](https://www.paddlepaddle.org.cn/documentation/docs/zh/1.5/api_cn/executor_cn.html)
+
+3. ```class paddle.fluid.Program``` **默认情况下，Paddle Fluid内部默认含有** [default_startup_program](https://www.paddlepaddle.org.cn/documentation/docs/zh/1.8/api_cn/fluid_cn/default_startup_program_cn.html#cn-api-fluid-default-startup-program) **和** [default_main_program](https://www.paddlepaddle.org.cn/documentation/docs/zh/1.8/api_cn/fluid_cn/default_main_program_cn.html#cn-api-fluid-default-main-program) **，它们共享参数。** [default_startup_program](https://www.paddlepaddle.org.cn/documentation/docs/zh/1.8/api_cn/fluid_cn/default_startup_program_cn.html#cn-api-fluid-default-startup-program) **只运行一次来初始化参数，** [default_main_program](https://www.paddlepaddle.org.cn/documentation/docs/zh/1.8/api_cn/fluid_cn/default_main_program_cn.html#cn-api-fluid-default-main-program) **在每个mini batch中运行并更新权重。**Program是Paddle Fluid对于计算图的一种静态描述。[参考链接](https://www.paddlepaddle.org.cn/documentation/docs/zh/1.8/api_cn/fluid_cn/Program_cn.html)
+4. ```paddle.fluid.program_guard(main_program, startup_program=None)```
+
+程序逻辑：
+
+```main```->```train(args)```
+
+```train(args)```:
+
+1. Get bert_config
+
+2. Set train_program and startup_program -> create model with bert config
+
+3. Set test_program -> create model with bert config
+
+4. create model: 
+
+   1. Set ```fluid.layers.py_reader```
+   2. Set ```fluid.layers.read_file```
+   3. Set and get BertModel
+   4. ```bert.get_pretraining_output```
+
+5. ```
+   exe = fluid.Executor(place)
+   exe.run(startup_prog)
+   ```
+
+6. DataReader
+
+7. Start training
 
