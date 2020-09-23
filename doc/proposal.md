@@ -285,7 +285,7 @@ with f:
 
 ```
 
-疑似缺少argument
+（疑似缺少argument）
 
 ### 测试版本
 
@@ -339,5 +339,32 @@ class MWUEncoder(BaseEncoder):
 
 ```curl --request POST -d '{"top_k": 10, "mode": "search",  "data": ["text:hey, Monica"]}' -H 'Content-Type: application/json' 'http://0.0.0.0:45678/api/search'```
 
+## 基于X-as-service进行测试
 
+1. 将docker从transformers换成paddlehub。
 
+   1. ``` git clone https://github.com/jina-ai/jina-hub.git```
+
+   2. ```cd encoders/nlp/TextPaddlehubEncoder```
+
+   3. ```docker build -t jina-paddle-encoder:v1 .```
+
+   4. 在app.py中，将
+
+      ```python
+      f = (Flow(callback_on_body=True)
+           .add(name='spit', uses='Sentencizer')
+           .add(name='encode', uses='jinaai/hub.executors.encoders.nlp.transformers-pytorch',
+                parallel=1, timeout_ready=20000))
+      ```
+
+      换成
+
+      ```python
+      f = (Flow(callback_on_body=True)
+           .add(name='spit', uses='Sentencizer')
+           .add(name='encode', uses='jina-paddle-encoder:v1',
+                parallel=1, timeout_ready=20000))
+      ```
+
+2. 考虑修改dockerfile，加入ernie的功能
