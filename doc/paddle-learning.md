@@ -167,6 +167,26 @@ BERT不是在给定所有前面词的条件下预测最可能的当前词，而�
 4. x -> x (dropout)
 5. return x
 
+```model/language_model.py``` 
+
+(BERTLM)
+
+1. x + segment_laebel -> x (bert)
+2. x -> tmp1 (NextSentencePrediction); x -> tmp2 (MaskedLanguageModel)
+3. return tmp1, tmp2
+
+(NextSentencePrediction)
+
+1. x[:, 0] -> tmp1 (linear)
+2. tmp1 -> tmp2 (softmax)
+3. return tmp2
+
+(MaskedLanguageModel)
+
+1. x -> x (linear)
+2. x -> x (softmax)
+3. return x
+
 ```model/embedding/bert.py``` (model)
 
 1. sequence -> tmp1 (TokenEmbedding)
@@ -176,3 +196,70 @@ BERT不是在给定所有前面词的条件下预测最可能的当前词，而�
 5. x -> x (dropout)
 6. return x
 
+```model/embedding/position.py``` (PositionEmbedding)
+
+1. ```python
+   pe = torch.zeros(max_len, d_model).float()
+   pe.require_grad = False
+   
+   position = torch.arange(0, max_len).float().unsqueeze(1)
+   div_term = (torch.arange(0, d_model, 2).float() * -(math.log(10000.0) / d_model)).exp()
+   
+   pe[:, 0::2] = torch.sin(position * div_term)
+   pe[:, 1::2] = torch.cos(position * div_term)
+   
+   pe = pe.unsqueeze(0)
+   ```
+
+2. return pe[max_len, x.size(1)]
+
+```model/embedding/segment.py``` (SegmentEmbedding)
+
+```model/embedding/token.py``` (PositionEmbedding)
+
+```model/attention/single.py``` (Attention)
+
+1. 
+
+```model/attention/multi_head.py``` (MultiHeadedAttention)
+
+1. 
+
+```model/utils/feed_forward.py``` (PositionwiseFeedForward)
+
+1. x -> tmp1 (Linear)
+2. tmp1 -> tmp2 (GELU)
+3. tmp2 -> tmp3 (dropout)
+4. tmp3 -> tmp4 (Linear)
+5. return tmp4
+
+```model/utils/gelu.py``` (GELU)
+
+1. ```python
+   def forward(self, x):
+     return 0.5 * x * (1 + torch.tanh(math.sqrt(2 / math.pi) * (x + 0.044715 * torch.pow(x, 3))))
+   ```
+
+```model/utils/layer_norm.py``` (LayerNorm)
+
+1. ```python
+   def forward(self, x):
+     mean = x.mean(-1, keepdim=True)
+     std = x.std(-1, keepdim=True)
+     return self.a_2 * (x - mean) / (std + self.eps) + self.b_2
+   ```
+
+```model/utils/sublayer.py``` (SublayerConnection)
+
+1. x -> tmp1 (LayerNorm)
+2. tmp1 -> tmp2 (sublayer)
+3. tmp2 -> tmp3 (dropout)
+4. return x + tmp3
+
+```train/optim_schedule.py```
+
+This file is to set the optimization
+
+```train/pretrain.py```
+
+This file is for training details.
