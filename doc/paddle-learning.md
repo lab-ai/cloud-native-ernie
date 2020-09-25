@@ -263,3 +263,10 @@ This file is to set the optimization
 ```train/pretrain.py```
 
 This file is for training details.
+
+# 对话情绪识别 
+
+
+
+对话情绪类别有三种：负向情绪(0)、中性情绪(1)和正向情绪(2)，属于短文本三分类问题。
+
