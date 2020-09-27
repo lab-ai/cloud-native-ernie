@@ -270,3 +270,26 @@ This file is for training details.
 
 对话情绪类别有三种：负向情绪(0)、中性情绪(1)和正向情绪(2)，属于短文本三分类问题。
 
+# Paddle-Serving
+
+## Installation
+
+```
+docker pull hub.baidubce.com/paddlepaddle/serving:latest
+docker run -p 9292:9292 --name paddle-serving-test -dit	hub.baidubce.com/paddlepaddle/serving:latest
+docker exec -it paddle-serving-test bash
+pip install paddle-serving-server==0.3.2 -i https://pypi.tuna.tsinghua.edu.cn/simple
+```
+
+## Test
+
+```
+wget --no-check-certificate https://paddle-serving.bj.bcebos.com/uci_housing.tar.gz
+tar -xzf uci_housing.tar.gz
+python -m paddle_serving_server.serve --model uci_housing_model --thread 10 --port 9292 --name uci
+```
+
+```
+curl -H "Content-Type:application/json" -X POST -d '{"feed":[{"x": [0.0137, -0.1136, 0.2553, -0.0692, 0.0582, -0.0727, -0.1583, -0.0584, 0.6283, 0.4919, 0.1856, 0.0795, -0.0332]}], "fetch":["price"]}' http://127.0.0.1:9292/uci/prediction
+```
+
