@@ -293,3 +293,13 @@ python -m paddle_serving_server.serve --model uci_housing_model --thread 10 --po
 curl -H "Content-Type:application/json" -X POST -d '{"feed":[{"x": [0.0137, -0.1136, 0.2553, -0.0692, 0.0582, -0.0727, -0.1583, -0.0584, 0.6283, 0.4919, 0.1856, 0.0795, -0.0332]}], "fetch":["price"]}' http://127.0.0.1:9292/uci/prediction
 ```
 
+## An End-to-end Tutorial from Training to Inference Service Deployment
+
+
+
+## Paddle Serving服务化部署框架
+
+常见的深度学习模型开发流程需要经过问题定义、数据准备、特征提取、建模、训练过程，以及最后一个环——将训练出来的模型部署应用到实际业务中。
+
+- 模型服务化部署：将模型以线上服务的形式部署在服务器或者云端，用户通过客户端请求发送需要推理的输入内容，服务器或者云通过响应报文将推理结果返回给用户。
+
