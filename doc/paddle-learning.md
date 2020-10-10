@@ -314,5 +314,34 @@ curl -H "Content-Type:application/json" -X POST -d '{"feed":[{"x": [0.0137, -0.1
 Paddle Serving框架支持两种推理服务方式，分别是**RPC服务**和**Web服务**，用户可以任选其一：
 
 1. RPC服务是CS架构，用户使用客户端来访问服务端获取推理结果，客户端和服务端之间的通信使用的是百度开源的一款RPC通信库来完成的。
-2. Web服务是BS架构，用户可以使用浏览器或其它Web应用通过HTTP协议访问服务端。与RPC相比其优势在于可以适用于包括Linux操作系统在内的不同系统环境。
+2. Web服务是BS架构，用户可以使用浏览器或其它Web应用通过HTTP协议访问服务端。与RPC相比其优势在于可以适用于包括Linux操作系统在内的不同系统环境。 
+
+## Paddle-Serving 文件结构
+
+```
+|-- cmake
+|-- core
+|-- |-- configure
+|-- |-- cube
+|-- |-- general-client
+|-- |-- general-server
+|-- |-- kvdb
+|-- |-- pdcodegen
+|-- |-- predictor
+|-- |-- sdk-cpp
+|-- |-- tests
+|-- |-- util
+|-- |-- CMakeLists.txt
+|-- doc
+|-- go
+|-- java
+|-- paddle_inference
+|-- python
+|-- tools
+|-- CMakeLists.txt
+|-- README.md
+|-- README_CN.md
+```
+
+
 
