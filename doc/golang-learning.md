@@ -6,7 +6,10 @@
 go run xxx.go
 go mod init xxx
 go build // make Go locate the module and add it as a dependency to the go.mod file.
+go test
 ```
+
+`go run` command is a useful shortcut for compiling and running a single-file program
 
 
 
