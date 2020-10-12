@@ -395,3 +395,75 @@ go test
     
 
     第二次调用的时候，因为adder只调用了一次，所以sum可以依旧保持原有的值。
+
+16. 方法
+
+    ``` go
+    type Vertex struct {
+    	X, Y float64
+    }
+    
+    func (v Vertex) Abs() float64 {
+    	return math.Sqrt(v.X*v.X + v.Y*v.Y)
+    }
+    
+    func main() {
+    	v := Vertex{3, 4}
+    	fmt.Println(v.Abs())
+    }
+    ```
+
+    Func 后面，跟着类
+
+    ``` go
+    type MyFloat float64
+    
+    func (f MyFloat) Abs() float64 {
+    	if f < 0 {
+    		return float64(-f)
+    	}
+    	return float64(f)
+    }
+    
+    func main() {
+    	f := MyFloat(-math.Sqrt2)
+    	fmt.Println(f.Abs())
+    }
+    ```
+
+    ``` go
+    type Vertex struct {
+    	X, Y float64
+    }
+    
+    func (v Vertex) Abs() float64 {
+    	return math.Sqrt(v.X*v.X + v.Y*v.Y)
+    }
+    
+    func (v *Vertex) Scale(f float64) {
+    	v.X = v.X * f
+    	v.Y = v.Y * f
+    }
+    
+    func main() {
+    	v := Vertex{3, 4}
+    	v.Scale(10)
+    	fmt.Println(v.Abs())
+    }
+    ```
+
+17. 指针与重定向
+
+    ``` go
+    var v Vertex
+    fmt.Println(AbsFunc(v))  // OK
+    fmt.Println(AbsFunc(&v)) // 编译错误！
+    
+    var v Vertex
+    fmt.Println(v.Abs()) // OK
+    p := &v
+    fmt.Println(p.Abs()) // OK
+    ```
+
+    
+
