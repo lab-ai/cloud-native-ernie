@@ -5,12 +5,13 @@
 1. 查看本地镜像 ```docker images```
 2. 创建容器 ```docker run -dit --name=容器名 镜像id /bin/bash ```
 3. 查看所有的容器 ```docker ps -a```
-4. 进入容器 ```docker exec -it 容器名 /bin/bash·```
-5. 退出容器 ```exit```
-6. 将容器制作成镜像 ```docker  commit  -m  '镜像描述'  -a  '制作者'  容器名  镜像名```
-7. 将制作好的镜像打成 tar 包 ```docker  save  -o  tar包的名字  镜像名```
-8. 根据Dockerfile创建容器 ```docker build -t nginx:v1 .```
-9. 本地上传文件 ```docker inspect -f '{{.ID}}' 容器名``` ```docker cp 本地路径 容器长ID:容器路径```
+4. 启动容器（之前以创建过的容器） ```docker start 容器名```
+5. 进入容器 ```docker exec -it 容器名 /bin/bash·```
+6. 退出容器 ```exit```
+7. 将容器制作成镜像 ```docker  commit  -m  '镜像描述'  -a  '制作者'  容器名  镜像名```
+8. 将制作好的镜像打成 tar 包 ```docker  save  -o  tar包的名字  镜像名```
+9. 根据Dockerfile创建容器 ```docker build -t nginx:v1 .```
+10. 本地上传文件 ```docker inspect -f '{{.ID}}' 容器名``` ```docker cp 本地路径 容器长ID:容器路径```
 
 [参考链接1](https://www.cnblogs.com/pjcd-32718195/p/11762079.html)
 [参考链接2](https://www.cnblogs.com/ityouknow/p/8588725.html)
