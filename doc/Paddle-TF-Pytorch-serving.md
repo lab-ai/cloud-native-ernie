@@ -161,3 +161,7 @@ for i in range(0,3):
     class_names[np.argmax(predictions[i])], np.argmax(predictions[i]), class_names[test_labels[i]], test_labels[i]))
 ```
 
+
+
+# Pytorch Serving
+
