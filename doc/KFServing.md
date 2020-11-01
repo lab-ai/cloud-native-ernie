@@ -40,3 +40,34 @@ kubectl get deployments # List the deployments
 3. Information about how to run each container, such as the container image version or specific ports to use
 
 A Pod always runs on a **Node**. A Node is a worker machine in Kubernetes and may be either a virtual or a physical machine, depending on the cluster.
+
+
+
+``` bash
+kubectl get namespaces
+kubectl get pods -n [namespace]
+kubectl describe pods
+```
+
+### Knative & Istio
+KFServing currently requires Knative Serving for auto-scaling, canary rollout, Istio for traffic routing and ingress.
+
+Knative & Lstio are foundmental layers for serverless and networking.
+
+
+
+Knative provides a set of building blocks that enable declarative, container-based, serverless workloads on Kubernetes. Knative Serving proves primitives for serving platforms such as:
+
+1. Event triggered functions on Kubernetes
+2. Scale to and from zero
+3. Queue based autoscaling for CPUs and TPUs. KNative autocaling by default provies inflight requests per pod
+4. Traditional CPU autoscaling if desired. Traditional scaling hard for disparate devices (GPU, CPU, TPU)
+
+
+
+Istio: An open service mesh platform to connect, observe, secure and control microservices.
+
+### Architecture
+
+
+
