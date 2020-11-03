@@ -71,3 +71,57 @@ Istio: An open service mesh platform to connect, observe, secure and control mic
 
 
 
+### Analysis
+
+``` bash
+main.go: kfserving/cmd/manager/main.go
+```
+
+1. Parser
+
+2. Get Config [Config](https://medium.com/@onexlab.io/golang-config-file-best-practise-d27d6a97a65a) 
+
+   ``` go
+   config.GetConfig()
+   ```
+
+3. Create manager controller [manager](https://github.com/kubernetes-sigs/controller-runtime/blob/master/pkg/manager/manager.go)
+
+   ``` go
+   manager.New()
+   // Manager initializes shared dependencies such as Caches and Clients, and provides them to Runnables.
+   // A Manager is required to create Controllers.
+   
+   func New(config *rest.Config, options Options) (Manager, error)
+   // New returns a new Manager for creating Controllers.
+   
+   mgr, err := manager.New(cfg, manager.Options{MetricsBindAddress: metricsAddr, Port: 9443})
+   // cfg, err := config.GetConfig()
+   // MetricsBindAddress:
+   // MetricsBindAddress is the TCP address that the controller should bind to
+   // for serving prometheus metrics.
+   // It can be set to "0" to disable the metrics serving.
+   ```
+
+4. Setup controllers
+
+   problem: [link](k8s.io/client-go/tools/record) 404 for func ```eventBroadcaster := record.NewBroadcaster()```
+
+   ​			   [link](https://kubernetes.io/client-go/kubernetes) 404 for func  ``` kubernetes.NewForConfig(mgr.GetConfig())```
+
+5. Setup trainedmodel controller
+
+   ``` trainedModelEventBroadcaster := record.NewBroadcaster()```
+
+6. Get web hook server
+
+   ``` go
+   hookServer.Register("/mutate-pods", &webhook.Admission{Handler: &pod.Mutator{}})
+   
+   func (s *Server) Register(path string, hook http.Handler)
+   // Register marks the given webhook as being served at the given path.
+   // It panics if two hooks are registered on the same path.
+   ```
+
+Controller logic in ```kfserving/pkg```
+
