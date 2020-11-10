@@ -49,7 +49,52 @@ kubectl get pods -n [namespace]
 kubectl describe pods
 ```
 
+yaml规则
+
+``` yam
+＃ 第一段
+apiVersion: vl 
+kind: Pod 
+metadata:
+	name: <string> 
+	namespace: [string] 
+	labels:
+		－ name: [string] 
+  annotations:
+		- name: [string]
+＃ 第二段
+spec :
+	containers:
+	- name: <string> 
+	  image: <string> 
+	  imagePullPolicy: [Always|Never|IfNotPresent]
+	  command: [string] 
+	  args: [string) 
+	  workingDir: [string) 
+	  volumeMounts:
+		- name: <string> 
+			mountPath: <string> 
+			readOnly: [true|false)
+```
+
+
+
+### Architecture
+
+在 Kubenetes 中， Service 是分布式集群架构的核心。 它是一种抽象的概念，每一个 Service 的后 端有多个 Pod ， 所有的容器均在 Pod 中运行。
+
+每个 Service 拥有一个唯一指定的名字，拥有一个虚拟 IP 和相应的端口号.
+
+Kubernetes 的 Node 节点主要由三个模块组成： kubelet 、 kube-proxy 、 runtime。
+
+1. Kubelet。 Kubelet 是 Master 在每个 Node 节点上的 agent ，是 Node 与 Master 通信的重要途径。
+2. Kube-proxy。 该模块实现了 Kubernetes 中的服务发现和反向代理功能。
+3. runtimeo runtime 指的是容器运行环境，目前 Kubernetes 支持 Docker 和 Rocket
+
+
+
 ### Knative & Istio
+
 KFServing currently requires Knative Serving for auto-scaling, canary rollout, Istio for traffic routing and ingress.
 
 Knative & Lstio are foundmental layers for serverless and networking.
@@ -66,8 +111,6 @@ Knative provides a set of building blocks that enable declarative, container-bas
 
 
 Istio: An open service mesh platform to connect, observe, secure and control microservices.
-
-### Architecture
 
 
 
@@ -107,21 +150,118 @@ main.go: kfserving/cmd/manager/main.go
 
    problem: [link](k8s.io/client-go/tools/record) 404 for func ```eventBroadcaster := record.NewBroadcaster()```
 
-   ​			   [link](https://kubernetes.io/client-go/kubernetes) 404 for func  ``` kubernetes.NewForConfig(mgr.GetConfig())```
-
-5. Setup trainedmodel controller
-
-   ``` trainedModelEventBroadcaster := record.NewBroadcaster()```
-
-6. Get web hook server
-
-   ``` go
-   hookServer.Register("/mutate-pods", &webhook.Admission{Handler: &pod.Mutator{}})
    
-   func (s *Server) Register(path string, hook http.Handler)
-   // Register marks the given webhook as being served at the given path.
-   // It panics if two hooks are registered on the same path.
-   ```
 
-Controller logic in ```kfserving/pkg```
+5. Creates a new Clientset for the given config.
+
+​	  [link](https://godoc.org/k8s.io/client-go/kubernetes#NewForConfig)  func  ``` kubernetes.NewForConfig(mgr.GetConfig())```
+
+​	``` func NewForConfig(c *rest.Config) (*Clientset, error)```
+
+6. Setup trainedmodel controller
+
+``` trainedModelEventBroadcaster := record.NewBroadcaster()```
+
+7. Get web hook server
+
+``` go
+hookServer.Register("/mutate-pods", &webhook.Admission{Handler: &pod.Mutator{}})
+
+func (s *Server) Register(path string, hook http.Handler)
+// Register marks the given webhook as being served at the given path.
+// It panics if two hooks are registered on the same path.
+```
+
+Controller logic in ```kfserving/pkg/controller```
+
+
+
+``` go
+// Parser
+// Get Config
+// Create manager controller
+// Creates a new event broadcaster.
+// Creates a new Clientset for the given config.
+// Setup controllers
+// Setup trainedmodel controller
+// Get webhook server
+
+
+package main
+
+import (
+	"flag"
+	"sigs.k8s.io/controller-runtime/pkg/client/config"
+	"sigs.k8s.io/controller-runtime/pkg/manager"
+	"k8s.io/client-go/tools/record"
+	"k8s.io/client-go/kubernetes"
+	typedcorev1 "k8s.io/client-go/kubernetes/typed/core/v1"
+
+
+)
+
+func main() {
+	var flagAddr string
+	flag.StringVar(&flagAddr, "Address", ":8080", "The address the metric endpoint binds to.")
+	flag.Parse()
+
+	// GetConfig creates a *rest.Config for talking to a Kubernetes API server. If --kubeconfig 
+	// is set, will use the kubeconfig file at that location. Otherwise will assume running in 
+	// cluster and use the cluster provided kubeconfig.
+	cfg, err := config.GetConfig()
+
+	// New returns a new Manager for creating Controllers.
+	mng, err := manager.New(cfg, manager.Options(MetricsBindAddress: flagAddr, Port: 9443))
+
+	// Creates a new event broadcaster.
+	eventBroadcaster = record.NewBroadcaster()
+
+	// NewForConfig creates a new Clientset for the given config. If config's RateLimiter is not 
+	// set and QPS and Burst are acceptable, NewForConfig will generate a rate-limiter in configShallowCopy.
+	clentSet, err := kubenetes.NewForConfig(mng.GetConfig())
+
+	// EventSink knows how to store events (client.Client implements it.)
+	// EventSink must respect the namespace that will be embedded in 'event'.
+	// It is assumed that EventSink will return the same sorts of errors as
+	// func (c *CoreV1Client) Events(namespace string) EventInterface
+	eventSink := &typedcorev1.EventSinkImpl{Interface: clientSet.CoreV1().Events("")}
+	// StartRecordingToSink starts sending events received from this EventBroadcaster to the given
+	// sink. The return value can be ignored or used to stop recording, if desired.
+	eventBroadcaster.StartRecordingToSink(eventSink)
+
+	trainedModelEventBroadcaster = record.NewBroadcaster()
+
+	eventSink := &typedcorev1.EventSinkImpl{Interface: clientSet.CoreV1().Events("")}
+	trainedModelEventBroadcaster.StartRecordingToSink(eventSink)
+
+	// GetWebhookServer returns a webhook.Server
+	server := mng.GetWebhookServer()
+	// Register marks the given webhook as being served at the given path. It panics if two hooks are 
+	// registered on the same path.
+	server.register()
+
+}
+```
+
+
+
+Controller: 在K8S 拥有很多controller 他们的职责是保证集群中各种资源的状态和用户定义(yaml)的状态一致, 如果出现偏差, 则修正资源的状态.
+
+Controller manager: controller manager 是各种controller的管理者,是集群内部的管理控制中心.
+
+Event: 它存储在Etcd里，记录了集群运行所遇到的各种大事件。
+
+Webhook: WebHook 是一种 HTTP 回调：某些条件下触发的 HTTP POST 请求；通过 HTTP POST 发送的简单事件通知。一个基于 web 应用实现的 WebHook 会在特定事件发生时把消息发送给特定的 URL. 具体来说，当在判断用户权限时，`Webhook` 模式会使 Kubernetes 查询外部的 REST 服务。
+
+
+
+### client-go
+
+``` go
+import "k8s.io/client-go/kubernetes"
+```
+
+RESTClient: Uniform Interface The uniform interface constraint defines the interface between clients and servers.
+
+
 
