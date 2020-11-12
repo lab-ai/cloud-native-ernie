@@ -265,3 +265,13 @@ RESTClient: Uniform Interface The uniform interface constraint defines the inter
 
 
 
+```
+--| pkg
+--| --| controller
+--| --| --| v1alpha2
+--| --| --| --| inferenceservice
+--| --| --| --| --| reconcilers
+--| --| --| --| --| --| istio
+--| --| --| --| --| --| knative
+```
+
