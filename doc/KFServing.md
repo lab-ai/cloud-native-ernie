@@ -272,6 +272,23 @@ RESTClient: Uniform Interface The uniform interface constraint defines the inter
 --| --| --| --| inferenceservice
 --| --| --| --| --| reconcilers
 --| --| --| --| --| --| istio
+--| --| --| --| --| --| --| virtualservice_reconciler.go
 --| --| --| --| --| --| knative
+```
+
+``` 
+controller/v1alpha2/inferenceservice/controller.go
+
+
+func Reconcile:
+  get inference service
+  get config
+  reconcilers using knative.NewServiceReconciler and istio.NewVirtualServiceReconciler
+
+func InferenceServiceReadiness:
+	return if ready
+	
+func updateStatus:
+	
 ```
 
