@@ -385,6 +385,8 @@ Inference service
 
 pkg/apis/serving/v1alpha2/inferenceservice_types.go
 
+All the specs are in this file
+
 ```go
 type InferenceService struct {
 	metav1.TypeMeta   `json:",inline"`
@@ -460,3 +462,36 @@ const (
 )
 ```
 
+
+
+```
+pkg/apis/serving/v1alpha2/explainer.go
+
+func GetStorageUri
+	getExplainer
+	get storage URI from explainer
+	
+func CreateExplainerContainer
+	getExplainer
+	create explainer container
+	
+func ApplyDefaults
+	getExplainer
+	apply defaults config
+	
+func Validate
+	get explainer
+	validate
+	
+func getExplainer
+	handlers is an array of Explainer
+	try append explainerSpec.Custom
+	try append explainerSpec.Alii
+	try append explainerSpec.AIX
+	if append only one of them, then correct and return
+	
+```
+
+
+
+Question:  Corev1, knservingv1 Service difference
