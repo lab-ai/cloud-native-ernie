@@ -305,6 +305,7 @@ func NewServiceReconciler:
 	create servcereconciler
 	
 func Reconcile:
+	with predictor transformer & explainer (in constants.go)
 	loop reconciler inferenceservice component with canery false
 	loop reconciler inferenceservice component with canery true
 	
@@ -375,4 +376,123 @@ func Reconcile:
 	
 
 ```
+
+
+
+[https://pkg.go.dev/github.com/kubeflow/kfserving/pkg/apis/serving/v1alpha2#InferenceService](https://pkg.go.dev/github.com/kubeflow/kfserving/pkg/apis/serving/v1alpha2#InferenceService)
+
+Inference service
+
+pkg/apis/serving/v1alpha2/inferenceservice_types.go
+
+All the specs are in this file
+
+```go
+type InferenceService struct {
+	metav1.TypeMeta   `json:",inline"`
+	metav1.ObjectMeta `json:"metadata,omitempty"`
+
+	Spec   InferenceServiceSpec   `json:"spec,omitempty"`
+	Status InferenceServiceStatus `json:"status,omitempty"`
+}
+
+// TypeMeta describes an individual object in an API response or request with strings representing the type of the object and its API schema version. Structures that are versioned or persisted should inline TypeMeta.
+type TypeMeta struct {
+	// Kind is a string value representing the REST resource this object represents.
+	// Servers may infer this from the endpoint the client submits requests to.
+	// Cannot be updated.
+	// In CamelCase.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+	// +optional
+	Kind string `json:"kind,omitempty" protobuf:"bytes,1,opt,name=kind"`
+
+	// APIVersion defines the versioned schema of this representation of an object.
+	// Servers should convert recognized schemas to the latest internal value, and
+	// may reject unrecognized values.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+	// +optional
+	APIVersion string `json:"apiVersion,omitempty" protobuf:"bytes,2,opt,name=apiVersion"`
+}
+
+
+```
+
+
+
+
+
+[knative.dev/serving/pkg/apis/serving/v1](https://godoc.org/knative.dev/serving/pkg/apis/serving/v1)
+
+```go
+knative.dev/serving/pkg/apis/serving/v1
+
+type Service struct {
+    metav1.TypeMeta `json:",inline"`
+    // +optional
+    metav1.ObjectMeta `json:"metadata,omitempty"`
+
+    // +optional
+    Spec ServiceSpec `json:"spec,omitempty"`
+
+    // +optional
+    Status ServiceStatus `json:"status,omitempty"`
+}
+```
+
+
+
+Explainer: a model explanation server
+
+Transformer: transformer service for pre/post processing
+
+pkg/constants/constants.go
+
+``` go
+// InferenceService Component enums
+const (
+	Predictor   InferenceServiceComponent = "predictor"
+	Explainer   InferenceServiceComponent = "explainer"
+	Transformer InferenceServiceComponent = "transformer"
+)
+
+// InferenceService verb enums
+const (
+	Predict InferenceServiceVerb = "predict"
+	Explain InferenceServiceVerb = "explain"
+)
+```
+
+
+
+```
+pkg/apis/serving/v1alpha2/explainer.go
+
+func GetStorageUri
+	getExplainer
+	get storage URI from explainer
+	
+func CreateExplainerContainer
+	getExplainer
+	create explainer container
+	
+func ApplyDefaults
+	getExplainer
+	apply defaults config
+	
+func Validate
+	get explainer
+	validate
+	
+func getExplainer
+	handlers is an array of Explainer
+	try append explainerSpec.Custom
+	try append explainerSpec.Alii
+	try append explainerSpec.AIX
+	if append only one of them, then correct and return
+	
+```
+
+
+
+Question:  Corev1, knservingv1 Service difference
 
