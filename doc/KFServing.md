@@ -495,3 +495,4 @@ func getExplainer
 
 
 Question:  Corev1, knservingv1 Service difference
+
