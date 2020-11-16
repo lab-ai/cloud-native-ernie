@@ -496,3 +496,28 @@ func getExplainer
 
 Question:  Corev1, knservingv1 Service difference
 
+
+
+
+
+Run in ONNX runtime
+
+kfserving/config/configmap/inferenceservice.yaml
+
+``` go
+"onnx": {
+  "image": "mcr.microsoft.com/onnxruntime/server",
+  "defaultImageVersion": "v1.0.0",
+  "supportedFrameworks": [
+    "onnx"
+  ],
+  "multiModelServer": "false"
+},
+```
+
+
+
+kfserving/pkg/apis/serving/v1alpha2/framework_onnx_test.go
+
+kfserving/pkg/apis/serving/v1alpha2/framework_onnx.go
+

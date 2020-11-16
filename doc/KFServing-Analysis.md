@@ -42,7 +42,14 @@ func updateStatus:
 	else if desired ready && existing ready, move to ready
 ```
 
+``` go
+	reconcilers := []Reconciler{
+		knative.NewServiceReconciler(r.Client, r.Scheme, configMap),
+		istio.NewVirtualServiceReconciler(r.Client, r.Scheme, configMap),
+	
+```
 
+Istio + knative
 
 ```kfserving/controller/v1beta1/inferenceservice/controller.go```
 
@@ -57,6 +64,22 @@ func Reconcile:
 	get infressreconciler
 	update serice status
 ```
+
+``` go
+	reconcilers := []components.Component{
+		components.NewPredictor(r.Client, r.Scheme, isvcConfig),
+	}
+	if isvc.Spec.Transformer != nil {
+		reconcilers = append(reconcilers, components.NewTransformer(r.Client, r.Scheme, isvcConfig))
+	}
+	if isvc.Spec.Explainer != nil {
+		reconcilers = append(reconcilers, components.NewExplainer(r.Client, r.Scheme, isvcConfig))
+	}
+```
+
+Ingress + knative
+
+Components folder added
 
 Packages required:
 
