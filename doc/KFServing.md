@@ -41,12 +41,20 @@ kubectl get deployments # List the deployments
 
 A Pod always runs on a **Node**. A Node is a worker machine in Kubernetes and may be either a virtual or a physical machine, depending on the cluster.
 
-
+Recall that Pods are running in an isolated, private network - so we need to proxy access to them so we can debug and interact with them. To do this, we'll use the `kubectl proxy` command to run a proxy in a second terminal window. Click on the command below to automatically open a new terminal and run the `proxy`
 
 ``` bash
 kubectl get namespaces
 kubectl get pods -n [namespace]
 kubectl describe pods
+
+# Let’s list the environment variables:
+kubectl exec $POD_NAME env
+# let’s start a bash session in the Pod’s container:
+kubectl exec -ti $POD_NAME bash
+
+# To see the ReplicaSet created by the Deployment, run
+kubectl get rs
 ```
 
 yaml规则
@@ -90,6 +98,30 @@ Kubernetes 的 Node 节点主要由三个模块组成： kubelet 、 kube-proxy 
 1. Kubelet。 Kubelet 是 Master 在每个 Node 节点上的 agent ，是 Node 与 Master 通信的重要途径。
 2. Kube-proxy。 该模块实现了 Kubernetes 中的服务发现和反向代理功能。
 3. runtimeo runtime 指的是容器运行环境，目前 Kubernetes 支持 Docker 和 Rocket
+
+
+
+Deployment
+
+一旦运行了 Kubernetes 集群，就可以在其上部署容器化应用程序。 为此，您需要创建 Kubernetes **Deployment** 配置。Deployment 指挥 Kubernetes 如何创建和更新应用程序的实例。
+
+Pod
+
+Pod 是 Kubernetes 抽象出来的，表示一组一个或多个应用程序容器（如 Docker），以及这些容器的一些共享资源。这些资源包括:
+
+- 共享存储，当作卷
+- 网络，作为唯一的集群 IP 地址
+- 有关每个容器如何运行的信息，例如容器映像版本或要使用的特定端口。
+
+Service
+
+Kubernetes Service 定义了这样一种抽象：逻辑上的一组 Pod，一种可以访问它们的策略 —— 通常称为微服务。
+
+Kubernetes [Pod](https://kubernetes.io/zh/docs/concepts/workloads/pods/) 是转瞬即逝的。 Pod 实际上拥有 [生命周期](https://kubernetes.io/zh/docs/concepts/workloads/pods/pod-lifecycle/)。 当一个工作 Node 挂掉后, 在 Node 上运行的 Pod 也会消亡。 [ReplicaSet](https://kubernetes.io/zh/docs/concepts/workloads/controllers/replicaset/) 会自动地通过创建新的 Pod 驱动集群回到目标状态，以保证应用程序正常运行。
+
+LoadBalancer
+
+负载均衡器Load Balancer服务是NodePort服务的扩展，负载均衡器拥有独立的可公开访问的IP地址，并将所有连接都重定向到服务，外部客户端可以通过负载均衡器的IP地址访问到集群内部的服务。
 
 
 
@@ -520,4 +552,55 @@ kfserving/config/configmap/inferenceservice.yaml
 kfserving/pkg/apis/serving/v1alpha2/framework_onnx_test.go
 
 kfserving/pkg/apis/serving/v1alpha2/framework_onnx.go
+
+
+
+
+
+
+
+
+
+How to start with tensorflow:
+
+``` go
+func (t *TensorflowSpec) GetContainer(modelName string, parallelism int, config *InferenceServicesConfig) *v1.Container
+```
+
+
+
+```kfserving/pkg/apis/serving/v1alpha2/predictor.go```
+
+``` go
+func getPredictor(predictorSpec *PredictorSpec) (Predictor, error) {
+	predictors := []Predictor{}
+	if predictorSpec.Custom != nil {
+		predictors = append(predictors, predictorSpec.Custom)
+	}
+	if predictorSpec.XGBoost != nil {
+		predictors = append(predictors, predictorSpec.XGBoost)
+	}
+	if predictorSpec.SKLearn != nil {
+		predictors = append(predictors, predictorSpec.SKLearn)
+	}
+	if predictorSpec.Tensorflow != nil {
+		predictors = append(predictors, predictorSpec.Tensorflow)
+	}
+	if predictorSpec.ONNX != nil {
+		predictors = append(predictors, predictorSpec.ONNX)
+	}
+	if predictorSpec.PyTorch != nil {
+		predictors = append(predictors, predictorSpec.PyTorch)
+	}
+	if predictorSpec.Triton != nil {
+		predictors = append(predictors, predictorSpec.Triton)
+	}
+	if len(predictors) != 1 {
+		err := fmt.Errorf(ExactlyOnePredictorViolatedError)
+		klog.Error(err)
+		return nil, err
+	}
+	return predictors[0], nil
+}
+```
 
