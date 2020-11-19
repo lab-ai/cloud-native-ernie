@@ -1,3 +1,366 @@
+# Kubernetes
+
+[video link](https://www.youtube.com/watch?v=X48VuDVv0do)
+
+## What is k8s
+
+Open source container orchestration tool
+
+Helps you manage containers 
+
+Containers for micro service
+
+Features:
+
+1. High availability or no downtime
+2. Scalability or high performance
+3. Disaster recovery - backup and restore
+
+
+
+## Component:
+
+Pod:
+
+1. Smallest unit of k8s
+2. Abstraction over container
+3. Usually 1 application per Pod
+4. Each Pod gets its own IP address
+5. New IP address on re-creation 
+
+Service:
+
+1. permanent IP address
+2. lifecycle of Pod and Service NOT connected
+3. External service: Open communications to the external resources. An http protocol with a node ip address (not the service) and the port number of the service
+4. Internal service: Other service except External service
+5. Ingress https://my-app.com instead of xx.xx.xx.xx:xxxx
+
+ConfigMap:
+
+1. external configuration of your application
+
+Secret:
+
+1. Config, but used to store secret data
+2. base64 encoded
+
+Volumes:
+
+1. Storage on local machine or remote, outside of the k8s cluster
+2. k8s doesn't manage data persistance
+
+Service has 2 functionalities:
+
+1. permanent IP
+2. load balancer: the service will catch the request and forward it to which ever pod is busy
+
+Deployment:
+
+1. blueprint for my-app pods. (replica)
+2. you create Deployments
+3. abstraction of pods
+
+StatefulSet: (database)
+
+1. For stateful apps or Databased
+2. Deploying Stateful not easy
+3. DB are often hosted outside of k8s cluster
+
+## Architecture explained
+
+Worker machine in k8s cluster (node)
+
+1. each Node has multiple Pods on it
+
+2. 3 process muse be installed on every Node
+
+3. Worker Nodes do the actural work
+
+   (1) container runtime (2) Kublet (interacts with both the container and node; starts the pod with a conainer inside) (3) kube proxy (forward the request)
+
+Masterprocess
+
+1. 4 processes run on every master node
+
+   (1) api server
+
+   	1. cluster gateway
+    	2. acts as a gate keeper for authentication 
+    	3. some request -> API server -> validate request -> other process -> pod
+
+   (2) Scheduler
+
+   1. schedule new pod -> API server -> scheduler -> where to put the pod
+   2. Scheduler just decide on whih node new pod should be scheduled
+
+   (3) Controller manager
+
+   1. detects cluster state changes
+   2. Controller manager -> schedule -> kubelet
+
+   (4) etcd
+
+   1. etcd is the cluster brain
+   2. cluster changes get stored in the key value store
+   3. Application data is not stored in etcd
+
+2. Multiple master where each masternode runs its master process. Distributed storage accross all master nodes.
+
+## Example Cluster Set-Up
+
+1. 2 Master Nodes    Less resources
+
+   3 Worker Nodes.   More resoures
+
+2. Add new Master/Node server
+
+   (1) get new bare server
+
+   (2) install all the master/worker node professes
+
+   (3) add it to the cluster
+
+## What is Minikube
+
+Production Cluster Setup
+
+1. Multiple master and worker nodes
+2. Separate virtual or physical machines
+
+Test on local machine -> qinikube
+
+1. create VIrtual Box on your laptop
+2. Node runs in that Virtual Box
+3. 1 Node K8s cluster
+4. for testing purposes
+
+## What is kubectl
+
+comand line tools for k8s cluster
+
+talk to Api Server
+
+## Basic kubectl commands
+
+``` bash
+kubectl get nodes
+kubectl get pod
+kubectl get services
+kubectl create [name] --image=[iamgedir]
+kubectl get deployment
+kubectl get replicaset
+kubectl edit deployment [name]
+kubectl logs [podname]
+kubectl describe pod [podname]
+kubectl exec -it [podname] -- bin/bash
+kubectl delete deployment [name]
+kubectl apply -f [filename]
+```
+
+ Pod is the smallest unit, but you create deployment, which is abstraction over pods
+
+ Replicaset is managign the replica of a pod
+
+1. Deployment manages a replicaset
+2. Replicaset manages a pod
+3. Pod is an abstraction of container
+
+## Configuration file
+
+Each configuration file has 3 parts
+
+1. metadata
+2. specification
+3. status: Etch holdes the status of all the components
+
+Use yaml validator 
+
+Template
+
+1. has its own metadata and spec section
+2. applies to pod
+3. blueprint for a pod
+
+connecting deployment to pods
+
+1. pods get the label through the template blueprint
+
+2. this label is matched by the selector
+
+connecting services to deployment
+
+Ports
+
+DBservice -> port -> nginx service -> target port -> pod
+
+Serice
+
+1. Selector: to connect to pod through label
+
+2. ports
+   1. Port: service port
+   2. containerport of deployment
+3. type LoadBalancer
+   1. asigns service an external IP address and so accepts external requests
+4. nodePort: 
+   1. port for external IP address
+   2. Port you need to put into your browser
+   3. 300000-32767
+5. minikube service xxxxx
+
+## Namespace
+
+1. Organise resources in namespace
+2. virtual cluster inside a cluster
+
+## Ingress explained
+
+routing rules: forward request to the internal service
+
+Host;
+
+1. valid domain address
+2. map domain name to Node's IP address, which is the entrypoint
+
+Ingress Controller:
+
+1. evaluates all the rules
+2. manages redirections
+3. entrypoint to cluster
+4. many third-party implementations
+5. K8s nginx ingress controller
+
+proxy server -> ingress controller
+
+Configure ingress controller in minikube
+
+1. install ingress controller in minikube
+
+   ```minikube addons enable ingress```
+
+2. create ingress rule
+
+## Helm explained
+
+Package Manager for Kubernetes
+
+​	To package YAML Files and distribute them in public and private repositories
+
+Helm Charts
+
+1. Bundle of YAML FIles
+2. Create your own Helm Charts with Helm
+3. Push them to Helm Repository
+4. Download and use. existing ones
+
+## Kubenetes Volumes explained
+
+1. storage that doesn't depend on the pod lifecycle
+2. storage must be available on all nodes
+3. storage needs to survie even if cluster crashes
+
+Persistent Volume
+
+1. a cluster resource
+2. created via YAML file
+   1. kind: PersistentVolume
+   2. spec: e.g. how much storage?
+
+Persistent Volume Clain
+
+1. Use that PVC in Pods configuration 
+2. Clains must be in the same namespace
+
+ConfigMap and Secret
+
+1. local volumes
+2. not created via PV and PVC
+3. managed by Kubernetes
+
+Storage Class
+
+​	StorageBackend is defined in the SC component
+
+1. Via "provisioner" attribute
+2. each storage backend has own provisioner
+3. internal provisioner - "kubernetes.io"
+4. external provisioner
+5. Configure parameters for storage we want to request for PV
+
+​     Another abstraction level
+
+1. abstracts underlying storage provider
+2. parameters for the storage
+
+1) Pod claines storage via PVC
+
+2) PVC requests stroage from SC
+
+3) SC creates PV that meets the needs of the Claim
+
+## k8s StatefulSet explained
+
+1. example of stateful applications:
+   1. databases
+   2. applications that store data
+
+2. don't keep record of state
+
+3. each request is completely new
+
+## k8s Service explained
+
+Each Pod has its own IP address
+
+1. Pods are ephemeral - are destroyed frequently
+
+Service
+
+1. stable IP address
+2. loadbalancing
+3. Loose coupling
+4. Within & outside service
+
+ClusterIP Services
+
+1. default type
+2. IP address from Node's port
+3. Selector
+   1. Pods are identified via selectors
+   2. Key value pairs
+   3. labels of pods
+   4. random label names
+4. k8s creates endpoint object 
+   1. same name as service 
+   2. keep track of, which pods are the members/endpoints of the service
+5. service port is arbitrary
+6. Targetport must match the port, the container is listening at
+
+Headless Services
+
+1. Client wants to communicate with 1 specific pod directly
+2. Pods want to talk directly with specific pod
+3. so, not randomly selected
+4. Use case; Stateful applications, like databases
+5. Pod replicas are not identical
+6. DNS lookup
+   1. DNS lookup for service - returns single IP address (Cluster IP)
+   2. Set ClusterIP to "none" - returns Pod IP address instead
+
+NodePort Service
+
+1. External traffic has access to fixed port on each worker node
+2. Node port range: 30000 - 32767
+
+LoadBalancer Service
+
+1. becomes accessible externally through cloud providers LoadBalancer
+2. LoadBalancer Service is an extension of NodePort Service
+3. NodePort Service is an extension of ClusterIP Service
+
+
+
 # KFServing
 
 KFServing provides a Kubernetes [Custom Resource Definition](https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/) for serving machine learning (ML) models on arbitrary frameworks.
@@ -122,6 +485,10 @@ Kubernetes [Pod](https://kubernetes.io/zh/docs/concepts/workloads/pods/) 是转�
 LoadBalancer
 
 负载均衡器Load Balancer服务是NodePort服务的扩展，负载均衡器拥有独立的可公开访问的IP地址，并将所有连接都重定向到服务，外部客户端可以通过负载均衡器的IP地址访问到集群内部的服务。
+
+helm
+
+Package manager
 
 
 
