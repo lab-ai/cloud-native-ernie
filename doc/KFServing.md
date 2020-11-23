@@ -359,7 +359,33 @@ LoadBalancer Service
 2. LoadBalancer Service is an extension of NodePort Service
 3. NodePort Service is an extension of ClusterIP Service
 
+# Istio
 
+[video link](https://www.youtube.com/watch?v=2FyhNONICkY)
+
+An open platform to connect, secure, control and observe services.
+
+service mesh
+
+custom resource definition (CRD) are a mechanism that allows you to extend kubernetes and  to add your own types in kubernetes
+
+Virtualservice are crd by istio 
+
+# Knative
+
+如同许多新的概念一样，Serverless目前还没有一个普遍公认的权威的定义。最新的一个定义是这样描述的：“无服务器架构是基于互联网的系统，其中应用开发不使用常规的服务进程。相反，它们仅依赖于第三方服务（例如AWS Lambda服务），客户端逻辑和服务托管远程过程调用的组合。”
+
+Knative 是谷歌牵头发起的 Serverless 项目，其定位为基于 Kubernetes 的 Serverless 解决方案，旨在标准化 Serverless，简化其学习成本。Knative 是以 Kubernetes 的一组自定义资源类型（CRD）的方式来安装的，因此只需使用几个 YAML 文件就可以轻松地开始使用 Knative 了。
+
+Knative 将重点放在两个关键组件上：为其提供流量serving（服务），以及确保应用程序能够轻松地生产和消费event（事件）。
+
+1. Serving（服务）
+
+   基于负载自动伸缩，包括在没有负载时缩减到零。允许你为多个修订版本（revision）应用创建流量策略，从而能够通过 URL 轻松路由到目标应用程序。
+
+2. Event（事件）
+
+   使得生产和消费事件变得容易。抽象出事件源，并允许操作人员使用自己选择的消息传递层。
 
 # KFServing
 
@@ -970,4 +996,20 @@ func getPredictor(predictorSpec *PredictorSpec) (Predictor, error) {
 	return predictors[0], nil
 }
 ```
+
+
+
+
+
+https://blog.csdn.net/luanpeng825485697/article/details/106986791/
+
+kfserving 内部使用的是knative。
+
+封装了一层InferenceService的k8s自定义资源，来实现knative中serving的services,route,configurations,revision
+
+
+
+Q: 您好，请问KFserving是如何将模型打包成容器部署到节点的呢？整个流程是咋样的？
+
+A: 模型存储在pv里面，容器只是环境，将模型地址传递给kfserving的容器，容器启动就能提供服务化
 
