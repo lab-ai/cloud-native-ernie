@@ -377,6 +377,8 @@ Virtualservice are crd by istio
 
 Knative 是谷歌牵头发起的 Serverless 项目，其定位为基于 Kubernetes 的 Serverless 解决方案，旨在标准化 Serverless，简化其学习成本。Knative 是以 Kubernetes 的一组自定义资源类型（CRD）的方式来安装的，因此只需使用几个 YAML 文件就可以轻松地开始使用 Knative 了。
 
+Knative 就是基于 Kubernetes 的应用 Serverless 编排系统。实际上 Knative 包含的不单单是 Workload，它还有 Kubernetes 原生的流程编排引擎和完备的事件系统。
+
 Knative 将重点放在两个关键组件上：为其提供流量serving（服务），以及确保应用程序能够轻松地生产和消费event（事件）。
 
 1. Serving（服务）
@@ -1012,4 +1014,19 @@ kfserving 内部使用的是knative。
 Q: 您好，请问KFserving是如何将模型打包成容器部署到节点的呢？整个流程是咋样的？
 
 A: 模型存储在pv里面，容器只是环境，将模型地址传递给kfserving的容器，容器启动就能提供服务化
+
+
+
+CRD:
+
+use the MultiNamespacedCacheBuilder to watch a specific set of namespaces
+
+use the `omitempty` struct tag to mark that a field should be omitted from serialization when empty
+
+```
+go mod init elastic-serving
+kubebuilder init --domain example.com
+kubebuilder create api --group batch --version v1 --kind CronJob
+
+```
 
