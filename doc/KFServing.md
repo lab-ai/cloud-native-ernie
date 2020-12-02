@@ -1031,3 +1031,7 @@ kubebuilder create api --group batch --version v1 --kind CronJob
 ```
 
 The [context](https://golang.org/pkg/context/) is used to allow cancelation of requests, and potentially things like tracing. It’s the first argument to all client methods. The `Background` context is just a basic context without any extra data or timing restrictions.
+
+
+
+Take a look at sample controller.
