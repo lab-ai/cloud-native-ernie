@@ -1035,3 +1035,11 @@ The [context](https://golang.org/pkg/context/) is used to allow cancelation of r
 
 
 Take a look at sample controller.
+
+
+
+
+
+1. Add deployment
+2. Add service
+3. Add ingress
